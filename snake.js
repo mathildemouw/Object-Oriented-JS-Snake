@@ -9,6 +9,7 @@ window.onload = function () {
 
 };
 
+/////////////The Field////////////
 function Field ( canvasId ) {
 	this.grass = document.getElementById( canvasId );
 	this.grassContext = this.grass.getContext( "2d" );
@@ -21,10 +22,10 @@ Field.prototype = {
 		this.grassContext.fillStyle = "#FF10E0";
 		food = new SnakeFood;
 		food.viewSnakeFood( this.grassContext );
-		// this.grassContext.fillRect( xCoord, yCoord, 2, 2 );
 	},
 }	
 
+/////////////The Food////////////
 function SnakeFood () {
 	this.xCoord = ( Math.floor( Math.random()*88 ) );
 	this.yCoord = ( Math.floor( Math.random()*48 ) );
@@ -38,17 +39,26 @@ SnakeFood.prototype = {
 
 /////////////The Snake////////////
 function SnakeController () {
+	this.view = new SnakeView;
+	this.binder = new SnakeBinder;
+	this.model = new SnakeModel;
 }
 SnakeController.prototype = {
 	// associate keyup events with snakeModel functions
+	move: function () {
+		// this.binder.listen();
+		// this.view.draw();
+		// this.model.slither();
+	},
 }
 
-function SnakeView () {
-}
+function SnakeBinder () {}
+SnakeBinder.prototype = {}
+
+function SnakeView () {}
 SnakeView.prototype = {
-	// set up rendering upon each movement
+	// set up rendering upon each movement based on model.body coordinates
 }
-
 
 function SnakeModel () {
 	this.body = [ { x:0, y:0 } ];
@@ -63,21 +73,20 @@ SnakeModel.prototype = {
 	// while this.body[0] is not intersecting with edge, or intersecting with itself, keep moving in current direction
 	// moves by + or - to x or y coordinate on every elemebt of body array w/ sleep in between
 	alive: function () {},
-	move: function () {
+	slither: function () {
 		while (this.alive){
 			for ( i=0; i<this.body.length; i++){
 				this.body[ i ].x += this.xdirection;
 				this.body[ i ].y += this.ydirection;
-				console.log(this.head);
 			}
 		}
 	},
-	turn: function () {},
-	// when snake head = food square, change food square color to snake color
-	eat: function () {
-		this.body.push()
-	},
-	// after eating food, move until tail is past food coord and add that coord to end of snake
-	// also will need to decrease sleep between moving after eating food
-	grow: function () {},
+	// turn: function () {},
+	// // when snake head = food square, change food square color to snake color
+	// eat: function () {
+	// 	this.body.push()
+	// },
+	// // after eating food, move until tail is past food coord and add that coord to end of snake
+	// // also will need to decrease sleep between moving after eating food
+	// grow: function () {},
 }
