@@ -1,47 +1,62 @@
 window.onload = function () {
 
-	var myField = new Field( "snake" );
-	myField.renderEcosystem();
+	myField = new Field( "snake" );
+	mySnakeFood = new SnakeFood;
 
-	myField.provideSnakeFood();
-	
 	mySnake = new SnakeController( myField );
-	mySnake.move();
+	
+	ecosystem = new Scene( { field: myField, food: mySnakeFood, snake: mySnake } );
+	ecosystem.render();
+
+	// mySnake.move();
 
 };
+/////////////Whole Scene////////////
+
+function Scene ( opts ) {
+	this.field = opts.field;
+	this.food = opts.food;
+	this.snake = opts.snake;
+}
+
+Scene.prototype = {
+	render: function () {
+		this.field.render();
+		this.food.render( this.field.context );
+		// this.snake.render();
+	},
+}
 
 /////////////The Field////////////
+
 function Field ( canvasId ) {
 		this.grass = document.getElementById( canvasId );
-		this.grassContext = this.grass.getContext( "2d" );
-		this.foodPosition = {x:10, y:10}
+		this.context = this.grass.getContext( "2d" );
 }
 
 Field.prototype = {
-	renderEcosystem: function () {
-		this.grassContext.fillStyle = "#AFEEEE";
-		this.grassContext.fillRect( 0, 0, 90, 50 );
-		this.grassContext.fillStyle = "#FF"
-		 //canvasnote: may want to make canvas limits arguments later
-	},
-	provideSnakeFood: function () {
-		this.grassContext.fillStyle = "#FF10E0";
-		food = new SnakeFood;
-		food.viewSnakeFood( this.grassContext );
-		this.foodPosition.x = food.xCoord;
-		this.foodPosition.y = food.yCoord;
+	render: function () {
+	this.context.fillStyle = "#AFEEEE";
+	this.context.fillRect( 0, 0, 90, 50 );
 	},
 }	
 
 /////////////The Food////////////
 function SnakeFood () {
-	this.xCoord = ( Math.floor( Math.random()*88 ) ); //canvasnote: should be the limits of the canvas, maybe if instead of while?
-	this.yCoord = ( Math.floor( Math.random()*48 ) );
+	this.xCoord = 3;
+	this.yCoord = 3;
 }
 
 SnakeFood.prototype = {
-	viewSnakeFood: function( context ){
+		//should show food at current position
+	render: function( context ){
+		context.fillStyle = "#FF10E0";
 		context.fillRect( this.xCoord, this.yCoord, 2, 2 );
+	},
+	updateFoodPos: function () {
+		// should change x and y coord values
+		this.xCoord = ( Math.floor( Math.random()*88 ) );
+		this.yCoord = ( Math.floor( Math.random()*48 ) );
 	},
 }
 
