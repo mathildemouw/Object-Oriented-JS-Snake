@@ -25,24 +25,18 @@ function GameController ( opts ) {
 	};
 }
 
-GameController.prototype = {
-	
-}
-
 /////////////Whole GameView////////////
 
 function GameView ( opts ) {
 	this.field = opts.field;
 	this.food = opts.food;
 	this.snake = opts.snake;
-}
 
-GameView.prototype = {
-	render: function () {
+	this.render = function () {
 		this.field.render();
 		this.food.render( this.field.context );
 		this.snake.render();
-	},
+	};
 }
 
 /////////////The Field////////////
@@ -66,13 +60,11 @@ function SnakeFood () {
 }
 
 SnakeFood.prototype = {
-		//should show food at current position
 	render: function( context ){
 		context.fillStyle = "#FF10E0";
 		context.fillRect( this.xCoord, this.yCoord, 2, 2 );
 	},
 	updateFoodPos: function () {
-		// should change x and y coord values
 		this.xCoord = ( Math.floor( Math.random()*88 ) );
 		this.yCoord = ( Math.floor( Math.random()*48 ) );
 	},
@@ -95,7 +87,23 @@ SnakeController.prototype = {
 }
 
 function SnakeBinder () {}
-SnakeBinder.prototype = {}
+SnakeBinder.prototype = {
+	changeDirection: // function () {
+		document.onkeydown = function(e) {
+			e = e || window.event;
+			switch(e.which || e.keyCode) {
+				case 37: console.log("TO THE LEFT!")//left
+				break;
+
+				case 39: console.log("TO THE RIGHT!")//right
+				break;
+
+				default: return; //exit handler -- this might not be what I need?
+			}
+			e.preventDefault(); 
+		}
+	//}
+}
 
 function SnakeView ( context ) {
 	this.context = context;
@@ -117,13 +125,12 @@ function SnakeModel () {
 	this.ydirection = 0;
 	this.xdirection = 1;
 }
-
 SnakeModel.prototype = {
 	// while this.body[0] is not intersecting with edge, or intersecting with itself, keep moving in current direction
 	// moves by + or - to x or y coordinate on every elemebt of body array w/ sleep in between
 
-	updateSnakePosition: function ( view ) {
-		if (this.head.x < 5){ //canvasnote: should be the limits of the canvas, maybe if instead of while?
+	updateSnakePosition: function (xdirection, ydirection) {
+		if (this.head.x < 5){
 			// for ( i=0; i<this.body.length; i++){
 				this.body[ 0 ].x += this.xdirection;
 				this.body[ 0 ].y += this.ydirection;
@@ -135,7 +142,10 @@ SnakeModel.prototype = {
 		};
 	},
 
-	// changeDirection: function () {},
+	changeDirection: function () {
+		// change direction of updateSnakePosition,based on key bindings
+		
+	},
 	
 	// // when snake head = food square, change food square color to snake color
 	// eat: function () {
