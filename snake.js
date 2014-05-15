@@ -42,14 +42,14 @@ function GameView ( opts ) {
 /////////////The Field////////////
 
 function Field ( canvasId ) {
-		this.grass = document.getElementById( canvasId );
-		this.context = this.grass.getContext( "2d" );
+	this.grass = document.getElementById( canvasId );
+	this.context = this.grass.getContext( "2d" );
 }
 
 Field.prototype = {
 	render: function () {
-	this.context.fillStyle = "#AFEEEE";
-	this.context.fillRect( 0, 0, 90, 50 );
+		this.context.fillStyle = "#AFEEEE";
+		this.context.fillRect( 0, 0, 90, 50 );
 	},
 }	
 
@@ -73,8 +73,8 @@ SnakeFood.prototype = {
 /////////////The Snake////////////
 function SnakeController ( context ) {
 	this.view = new SnakeView ( context ) ;
-	this.binder = new SnakeBinder;
 	this.model = new SnakeModel;
+	this.binder = new SnakeBinder( this.model );
 }
 SnakeController.prototype = {
 	render: function () {
@@ -86,23 +86,32 @@ SnakeController.prototype = {
 	},
 }
 
-function SnakeBinder () {}
-SnakeBinder.prototype = {
-	changeDirection: // function () {
-		document.onkeydown = function(e) {
-			e = e || window.event;
-			switch(e.which || e.keyCode) {
-				case 37: console.log("TO THE LEFT!")//left
-				break;
+function SnakeBinder (model) {
+	this.model = model;
+	this.changeDirection();
+}
 
-				case 39: console.log("TO THE RIGHT!")//right
-				break;
+SnakeBinder.prototype.changeDirection = function() {
+	binder = this; //somewhere where this is the binder though
+	document.onkeydown = function(e) {
+		e = e || window.event;
+		switch(e.which || e.keyCode) {
+			case 37: binder.model.updateSnakeDirection(-1, 0)
+			break;
 
-				default: return; //exit handler -- this might not be what I need?
-			}
-			e.preventDefault(); 
+			case 38: binder.model.updateSnakeDirection(0, -1)//down
+			break;
+
+			case 39: binder.model.updateSnakeDirection(1, 0)//right
+			break;
+
+			case 40: binder.model.updateSnakeDirection(0, 1)//up
+			break;
+
+			default: return; //exit handler -- this might not be what I need?
 		}
-	//}
+	e.preventDefault(); 
+  }
 }
 
 function SnakeView ( context ) {
@@ -122,18 +131,25 @@ function SnakeModel () {
 	this.head = this.body[0];
 	this.tail = this.body[this.body.length - 1];
 
-	this.ydirection = 0;
 	this.xdirection = 1;
+	this.ydirection = 0;
 }
 SnakeModel.prototype = {
 	// while this.body[0] is not intersecting with edge, or intersecting with itself, keep moving in current direction
 	// moves by + or - to x or y coordinate on every elemebt of body array w/ sleep in between
 
-	updateSnakePosition: function (xdirection, ydirection) {
-		if (this.head.x < 5){
+	updateSnakeDirection: function (xdirection, ydirection) {
+			this.xdirection = xdirection;
+			this.ydirection = ydirection;
+		},
+
+	updateSnakePosition: function () {
+		if (this.head.x < 90){
 			// for ( i=0; i<this.body.length; i++){
 				this.body[ 0 ].x += this.xdirection;
 				this.body[ 0 ].y += this.ydirection;
+				console.log(this.xdirection);
+
 				// user setTimeout() to make it sleep between renderings or setInterval()
 			// }
 		}
