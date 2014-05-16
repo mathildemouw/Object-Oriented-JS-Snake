@@ -96,7 +96,7 @@ SnakeBinder.prototype.changeDirection = function() {
 	document.onkeydown = function(e) {
 		e = e || window.event;
 		switch(e.which || e.keyCode) {
-			case 37: binder.model.updateSnakeDirection(-1, 0)
+			case 37: binder.model.updateSnakeDirection(-1, 0)//left
 			break;
 
 			case 38: binder.model.updateSnakeDirection(0, -1)//down
@@ -107,8 +107,6 @@ SnakeBinder.prototype.changeDirection = function() {
 
 			case 40: binder.model.updateSnakeDirection(0, 1)//up
 			break;
-
-			default: return; //exit handler -- this might not be what I need?
 		}
 	e.preventDefault(); 
   }
@@ -130,6 +128,7 @@ function SnakeModel () {
 	this.body = [ { x:0, y:0 } ];
 	this.head = this.body[0];
 	this.tail = this.body[this.body.length - 1];
+	this.alive =
 
 	this.xdirection = 1;
 	this.ydirection = 0;
@@ -138,7 +137,7 @@ SnakeModel.prototype = {
 	// while this.body[0] is not intersecting with edge, or intersecting with itself, keep moving in current direction
 	// moves by + or - to x or y coordinate on every elemebt of body array w/ sleep in between
 
-	updateSnakeDirection: function (xdirection, ydirection) {
+	updateSnakeDirection: function ( xdirection, ydirection ) {
 			this.xdirection = xdirection;
 			this.ydirection = ydirection;
 		},
@@ -148,19 +147,11 @@ SnakeModel.prototype = {
 			// for ( i=0; i<this.body.length; i++){
 				this.body[ 0 ].x += this.xdirection;
 				this.body[ 0 ].y += this.ydirection;
-				console.log(this.xdirection);
-
-				// user setTimeout() to make it sleep between renderings or setInterval()
 			// }
 		}
 		else{
 			console.log("SNAAAAKE!")
 		};
-	},
-
-	changeDirection: function () {
-		// change direction of updateSnakePosition,based on key bindings
-		
 	},
 	
 	// // when snake head = food square, change food square color to snake color
