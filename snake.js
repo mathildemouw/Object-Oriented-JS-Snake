@@ -128,7 +128,7 @@ function SnakeModel () {
 	this.body = [ { x:0, y:0 } ];
 	this.head = this.body[0];
 	this.tail = this.body[this.body.length - 1];
-	this.alive =
+	this.isAlive = true;
 
 	this.xdirection = 1;
 	this.ydirection = 0;
@@ -143,8 +143,10 @@ SnakeModel.prototype = {
 		},
 
 	updateSnakePosition: function () {
-		if (this.head.x < 90){
+		if (this.isAlive < 90){
 			// for ( i=0; i<this.body.length; i++){
+				//pop off tail
+				//draw new head in correct spot
 				this.body[ 0 ].x += this.xdirection;
 				this.body[ 0 ].y += this.ydirection;
 			// }
