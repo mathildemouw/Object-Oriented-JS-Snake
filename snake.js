@@ -25,37 +25,36 @@ function GameController ( opts ) {
 	};
 }
 
-GameController.prototype = {
-	
-}
-
 /////////////Whole GameView////////////
 
 function GameView ( opts ) {
 	this.field = opts.field;
 	this.food = opts.food;
 	this.snake = opts.snake;
-}
 
-GameView.prototype = {
-	render: function () {
+	this.render = function () {
+		if ((this.snake.model.head.x == this.food.xCoord) && (this.snake.model.head.y == this.food.yCoord)){
+			this.food.updateFoodPos();
+			this.snake.model.eat();
+		}
+
 		this.field.render();
 		this.food.render( this.field.context );
 		this.snake.render();
-	},
+	};
 }
 
 /////////////The Field////////////
 
 function Field ( canvasId ) {
-		this.grass = document.getElementById( canvasId );
-		this.context = this.grass.getContext( "2d" );
+	this.grass = document.getElementById( canvasId );
+	this.context = this.grass.getContext( "2d" );
 }
 
 Field.prototype = {
 	render: function () {
-	this.context.fillStyle = "#AFEEEE";
-	this.context.fillRect( 0, 0, 90, 50 );
+		this.context.fillStyle = "#AFEEEE";
+		this.context.fillRect( 0, 0, 90, 50 );
 	},
 }	
 
@@ -66,13 +65,11 @@ function SnakeFood () {
 }
 
 SnakeFood.prototype = {
-		//should show food at current position
 	render: function( context ){
 		context.fillStyle = "#FF10E0";
-		context.fillRect( this.xCoord, this.yCoord, 2, 2 );
+		context.fillRect( this.xCoord, this.yCoord, 1, 1 );
 	},
 	updateFoodPos: function () {
-		// should change x and y coord values
 		this.xCoord = ( Math.floor( Math.random()*88 ) );
 		this.yCoord = ( Math.floor( Math.random()*48 ) );
 	},
@@ -81,12 +78,12 @@ SnakeFood.prototype = {
 /////////////The Snake////////////
 function SnakeController ( context ) {
 	this.view = new SnakeView ( context ) ;
-	this.binder = new SnakeBinder;
 	this.model = new SnakeModel;
+	this.binder = new SnakeBinder( this.model );
 }
 SnakeController.prototype = {
 	render: function () {
-		this.view.draw( this.context );
+		this.view.draw( this.model.segments );
 	},
 
 	move: function () {
@@ -94,55 +91,74 @@ SnakeController.prototype = {
 	},
 }
 
-function SnakeBinder () {}
-SnakeBinder.prototype = {}
+function SnakeBinder ( model ) {
+	this.model = model;
+	this.changeDirection();
+}
+
+SnakeBinder.prototype.changeDirection = function() {
+	binder = this;
+	document.onkeydown = function( e ) {
+		e = e || window.event;
+		switch(e.which || e.keyCode) {
+			case 37: binder.model.updateSnakeDirection( -1, 0 )//left
+			break;
+
+			case 38: binder.model.updateSnakeDirection( 0, -1 )//down
+			break;
+
+			case 39: binder.model.updateSnakeDirection( 1, 0 )//right
+			break;
+
+			case 40: binder.model.updateSnakeDirection( 0, 1 )//up
+			break;
+		}
+	e.preventDefault(); 
+  }
+}
 
 function SnakeView ( context ) {
 	this.context = context;
 }
 SnakeView.prototype = {
-	draw: function () {
-		for (var i=0, segments = mySnake.model.body; i<segments.length; i++){
-			this.context.fillStyle = "#000000"
-			this.context.fillRect( segments[ i ].x, segments[ i ].y, 2, 2 )
+	draw: function ( segments ) {
+		for (var i=0, segments; i<segments.length; i++){
+			this.context.fillStyle = "#000000";
+			this.context.fillRect( segments[ i ].x, segments[ i ].y, 1, 1 );
 		}
 	},
 }
 
 function SnakeModel () {
-	this.body = [ { x:0, y:0 } ];
-	this.head = this.body[0];
-	this.tail = this.body[this.body.length - 1];
+	this.segments = [ { x:1, y:0 }, {x:0, y:0} ];
+	this.head = this.segments[ this.segments.length - 1 ];
 
-	this.ydirection = 0;
 	this.xdirection = 1;
+	this.ydirection = 0;
 }
-
 SnakeModel.prototype = {
-	// while this.body[0] is not intersecting with edge, or intersecting with itself, keep moving in current direction
-	// moves by + or - to x or y coordinate on every elemebt of body array w/ sleep in between
 
-	updateSnakePosition: function ( view ) {
-		if (this.head.x < 5){ //canvasnote: should be the limits of the canvas, maybe if instead of while?
-			// for ( i=0; i<this.body.length; i++){
-				this.body[ 0 ].x += this.xdirection;
-				this.body[ 0 ].y += this.ydirection;
-				// user setTimeout() to make it sleep between renderings or setInterval()
-			// }
-		}
-		else{
-			console.log("SNAAAAKE!")
-		};
+	updateSnakeDirection: function ( xdirection, ydirection ) {
+			this.xdirection = xdirection;
+			this.ydirection = ydirection;
+		},
+
+	updateSnakePosition: function () {
+				newHead = {};
+				newHead.x = (this.head.x += this.xdirection);
+				newHead.y = (this.head.y += this.ydirection);
+				this.segments.unshift(newHead);
+
+				this.segments.pop();
 	},
 
-	// changeDirection: function () {},
+	// checkForEdgeCollision: function () {},
+
+	// checkForSegmentsCollision: function () {},
 	
-	// // when snake head = food square, change food square color to snake color
-	// eat: function () {
-	// 	this.body.push()
-	// },
+	eat: function () {
+		newTail = this.head;
+		this.segments.unshift(newTail);
+	},
 	
-	// // after eating food, move until tail is past food coord and add that coord to end of snake
-	// // also will need to decrease sleep between moving after eating food
-	// grow: function () {},
 }
