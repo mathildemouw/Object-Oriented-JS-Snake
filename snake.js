@@ -1,7 +1,7 @@
 window.onload = function () {
 
-	myField = new Field( "snake" );
-	mySnakeFood = new SnakeFood;
+	myField = new Field( {canvasId: "snake", yMax: 90, xMax: 50} );
+	mySnakeFood = new SnakeFood( {xMax: myField.xMax, yMax: myField.yMax} );
 
 	mySnake = new SnakeController( myField.context );
 	
@@ -9,7 +9,7 @@ window.onload = function () {
 	ecosystem.render();
 
 	myGame = new GameController( { scene: ecosystem, snake: mySnake } );
-	turnPace = setInterval( myGame.nextTurn, 1000 );
+	turnPace = setInterval( myGame.nextTurn, 500 );
 
 };
 /////////////Each Turn////////////
@@ -33,35 +33,62 @@ function GameView ( opts ) {
 	this.snake = opts.snake;
 
 	this.render = function () {
-		if ((this.snake.model.head.x == this.food.xCoord) && (this.snake.model.head.y == this.food.yCoord)){
+		if (( this.snake.model.head.x == this.food.xCoord ) && ( this.snake.model.head.y == this.food.yCoord )){
 			this.food.updateFoodPos();
 			this.snake.model.eat();
 		}
+		else if (( this.snake.model.head.x >= this.field.xMax ) || ( this.snake.model.head.y >= this.field.yMax )){
+			clearInterval(turnPace)
+			console.log("You lost!")
+		}
+		else if (( this.snake.model.head.x < 0 ) || ( this.snake.model.head.y < 0 )){
+			clearInterval(turnPace)
+			console.log("You lost, the snake is dead!")
+		}
+		// else if ( this.snakeCollision() ){
+		// 	console.log("You lose")
+		// 	this.snake = "dead snake 0 points!"
+		// }
 
 		this.field.render();
 		this.food.render( this.field.context );
 		this.snake.render();
 	};
+
+	// this.snakeCollision = function () {
+	// 	for(  var i=1, segs = this.snake.model.segments; i<segs.length; i++ ){
+	// 		if((segs[ i ].x == this.snake.model.head.x) && (segs[ i ].y == this.snake.model.head.y)){
+	// 			return true
+	// 		}
+	// 		else{
+	// 			return false;
+	// 		}
+	// 	};
+	// };
 }
 
 /////////////The Field////////////
 
-function Field ( canvasId ) {
-	this.grass = document.getElementById( canvasId );
+function Field ( opts ) {
+	this.grass = document.getElementById( opts.canvasId );
 	this.context = this.grass.getContext( "2d" );
+	this.xMax = opts.xMax;
+	this.yMax = opts.yMax;
 }
 
 Field.prototype = {
 	render: function () {
 		this.context.fillStyle = "#AFEEEE";
-		this.context.fillRect( 0, 0, 90, 50 );
+		this.context.fillRect( 0, 0, this.yMax, this.xMax );
 	},
 }	
 
 /////////////The Food////////////
-function SnakeFood () {
+function SnakeFood ( opts ) {
 	this.xCoord = 3;
 	this.yCoord = 3;
+	this.xMax = opts.xMax;
+	this.yMax = opts.yMax;
 }
 
 SnakeFood.prototype = {
@@ -70,8 +97,8 @@ SnakeFood.prototype = {
 		context.fillRect( this.xCoord, this.yCoord, 1, 1 );
 	},
 	updateFoodPos: function () {
-		this.xCoord = ( Math.floor( Math.random()*88 ) );
-		this.yCoord = ( Math.floor( Math.random()*48 ) );
+		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 2) ));
+		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 2) ));
 	},
 }
 
@@ -130,7 +157,7 @@ SnakeView.prototype = {
 }
 
 function SnakeModel () {
-	this.segments = [ { x:1, y:0 }, {x:0, y:0} ];
+	this.segments = [ {x:0, y:0} ];
 	this.head = this.segments[ this.segments.length - 1 ];
 
 	this.xdirection = 1;
@@ -152,13 +179,9 @@ SnakeModel.prototype = {
 				this.segments.pop();
 	},
 
-	// checkForEdgeCollision: function () {},
-
-	// checkForSegmentsCollision: function () {},
-	
 	eat: function () {
-		newTail = this.head;
-		this.segments.unshift(newTail);
+		newTail = this.segments[ 0 ];
+		this.segments.push( newTail );
 	},
 	
 }
