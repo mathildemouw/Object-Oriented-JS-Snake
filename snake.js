@@ -144,10 +144,14 @@ SnakeModel.prototype = {
 		},
 
 	updateSnakePosition: function () {
-				newHead = {};
-				newHead.x = (this.head.x += this.xdirection);
-				newHead.y = (this.head.y += this.ydirection);
-				this.segments.unshift(newHead);
+				newSegment = {};
+				newSegment.x = (this.head.x);
+				newSegment.y = (this.head.y);
+
+				this.head.x += this.xdirection;
+				this.head.y += this.ydirection;
+				
+				this.segments.unshift(newSegment);
 
 				this.segments.pop();
 	},
