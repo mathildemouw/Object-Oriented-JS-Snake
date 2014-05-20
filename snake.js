@@ -33,6 +33,11 @@ function GameView ( opts ) {
 	this.snake = opts.snake;
 
 	this.render = function () {
+		if ((this.snake.model.head.x == this.food.xCoord) && (this.snake.model.head.y == this.food.yCoord)){
+			this.food.updateFoodPos();
+			this.snake.model.eat();
+		}
+
 		this.field.render();
 		this.food.render( this.field.context );
 		this.snake.render();
@@ -62,7 +67,7 @@ function SnakeFood () {
 SnakeFood.prototype = {
 	render: function( context ){
 		context.fillStyle = "#FF10E0";
-		context.fillRect( this.xCoord, this.yCoord, 2, 2 );
+		context.fillRect( this.xCoord, this.yCoord, 1, 1 );
 	},
 	updateFoodPos: function () {
 		this.xCoord = ( Math.floor( Math.random()*88 ) );
@@ -78,7 +83,7 @@ function SnakeController ( context ) {
 }
 SnakeController.prototype = {
 	render: function () {
-		this.view.draw( this.context );
+		this.view.draw( this.model.segments );
 	},
 
 	move: function () {
@@ -86,26 +91,26 @@ SnakeController.prototype = {
 	},
 }
 
-function SnakeBinder (model) {
+function SnakeBinder ( model ) {
 	this.model = model;
 	this.changeDirection();
 }
 
 SnakeBinder.prototype.changeDirection = function() {
-	binder = this; //somewhere where this is the binder though
-	document.onkeydown = function(e) {
+	binder = this;
+	document.onkeydown = function( e ) {
 		e = e || window.event;
 		switch(e.which || e.keyCode) {
-			case 37: binder.model.updateSnakeDirection(-1, 0)//left
+			case 37: binder.model.updateSnakeDirection( -1, 0 )//left
 			break;
 
-			case 38: binder.model.updateSnakeDirection(0, -1)//down
+			case 38: binder.model.updateSnakeDirection( 0, -1 )//down
 			break;
 
-			case 39: binder.model.updateSnakeDirection(1, 0)//right
+			case 39: binder.model.updateSnakeDirection( 1, 0 )//right
 			break;
 
-			case 40: binder.model.updateSnakeDirection(0, 1)//up
+			case 40: binder.model.updateSnakeDirection( 0, 1 )//up
 			break;
 		}
 	e.preventDefault(); 
@@ -116,26 +121,22 @@ function SnakeView ( context ) {
 	this.context = context;
 }
 SnakeView.prototype = {
-	draw: function () {
-		for (var i=0, segments = mySnake.model.body; i<segments.length; i++){
-			this.context.fillStyle = "#000000"
-			this.context.fillRect( segments[ i ].x, segments[ i ].y, 2, 2 )
+	draw: function ( segments ) {
+		for (var i=0, segments; i<segments.length; i++){
+			this.context.fillStyle = "#000000";
+			this.context.fillRect( segments[ i ].x, segments[ i ].y, 1, 1 );
 		}
 	},
 }
 
 function SnakeModel () {
-	this.body = [ { x:0, y:0 } ];
-	this.head = this.body[0];
-	this.tail = this.body[this.body.length - 1];
-	this.isAlive = true;
+	this.segments = [ { x:1, y:0 }, {x:0, y:0} ];
+	this.head = this.segments[ this.segments.length - 1 ];
 
 	this.xdirection = 1;
 	this.ydirection = 0;
 }
 SnakeModel.prototype = {
-	// while this.body[0] is not intersecting with edge, or intersecting with itself, keep moving in current direction
-	// moves by + or - to x or y coordinate on every elemebt of body array w/ sleep in between
 
 	updateSnakeDirection: function ( xdirection, ydirection ) {
 			this.xdirection = xdirection;
@@ -143,25 +144,21 @@ SnakeModel.prototype = {
 		},
 
 	updateSnakePosition: function () {
-		if (this.isAlive < 90){
-			// for ( i=0; i<this.body.length; i++){
-				//pop off tail
-				//draw new head in correct spot
-				this.body[ 0 ].x += this.xdirection;
-				this.body[ 0 ].y += this.ydirection;
-			// }
-		}
-		else{
-			console.log("SNAAAAKE!")
-		};
+				newHead = {};
+				newHead.x = (this.head.x += this.xdirection);
+				newHead.y = (this.head.y += this.ydirection);
+				this.segments.unshift(newHead);
+
+				this.segments.pop();
+	},
+
+	// checkForEdgeCollision: function () {},
+
+	// checkForSegmentsCollision: function () {},
+	
+	eat: function () {
+		newTail = this.head;
+		this.segments.unshift(newTail);
 	},
 	
-	// // when snake head = food square, change food square color to snake color
-	// eat: function () {
-	// 	this.body.push()
-	// },
-	
-	// // after eating food, move until tail is past food coord and add that coord to end of snake
-	// // also will need to decrease sleep between moving after eating food
-	// grow: function () {},
 }
