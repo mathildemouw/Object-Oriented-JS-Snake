@@ -1,6 +1,6 @@
 window.onload = function () {
 
-	myField = new Field( {canvasId: "snake", yMax: 90, xMax: 50} );
+	myField = new Field( {canvasId: "snake", yMax: 90, xMax: 60} );
 	mySnakeFood = new SnakeFood( {xMax: myField.xMax, yMax: myField.yMax} );
 
 	mySnake = new SnakeController( myField.context );
@@ -9,7 +9,7 @@ window.onload = function () {
 	ecosystem.render();
 
 	myGame = new GameController( { scene: ecosystem, snake: mySnake } );
-	turnPace = setInterval( myGame.nextTurn, 500 );
+	turnPace = setInterval( myGame.nextTurn, 200 );
 
 };
 /////////////Each Turn////////////
@@ -38,7 +38,7 @@ function GameView ( opts ) {
 			this.snake.model.eat();
 		}
 
-		else if (( this.snake.model.head.x >= this.field.yMax ) || ( this.snake.model.head.y >= this.field.xMax )){
+		else if (( this.snake.model.head.x >= (this.field.yMax - 3) ) || ( this.snake.model.head.y >= (this.field.xMax - 3) )){//transforms by 3
 			clearInterval(turnPace)
 		}
 		else if (( this.snake.model.head.x < 0 ) || ( this.snake.model.head.y < 0 )){
@@ -82,7 +82,7 @@ Field.prototype = {
 /////////////The Food////////////
 function SnakeFood ( opts ) {
 	this.xCoord = 3;
-	this.yCoord = 3;
+	this.yCoord = 15;
 	this.xMax = opts.xMax;
 	this.yMax = opts.yMax;
 }
@@ -90,11 +90,11 @@ function SnakeFood ( opts ) {
 SnakeFood.prototype = {
 	render: function( context ){
 		context.fillStyle = "#FF10E0";
-		context.fillRect( this.xCoord, this.yCoord, 1, 1 );
+		context.fillRect( this.xCoord, this.yCoord, 3, 3 );//transforms by 3
 	},
 	updateFoodPos: function () {
-		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 2) ));
-		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 2) ));
+		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 3) ));//transforms by 3
+		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 3) ));//transforms by 3
 	},
 }
 /////////////The Snake////////////
@@ -144,7 +144,7 @@ SnakeView.prototype = {
 	draw: function ( segments ) {
 		for (var i=0, segments; i<segments.length; i++){
 			this.context.fillStyle = "#000000";
-			this.context.fillRect( segments[ i ].x, segments[ i ].y, 1, 1 );
+			this.context.fillRect( segments[ i ].x, segments[ i ].y, 3, 3 ); //transforms by 3
 		}
 	},
 }
@@ -160,7 +160,7 @@ function SnakeModel () {
 }
 SnakeModel.prototype = {
 
-	turn: function ( direction ) {
+	turn: function ( direction ) { //transforms by 3
 		switch( direction ){
 			case "left": if (this.direction == "right") {}
 			else{ 
