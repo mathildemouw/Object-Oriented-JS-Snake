@@ -40,16 +40,13 @@ function GameView ( opts ) {
 
 		else if (( this.snake.model.head.x >= this.field.yMax ) || ( this.snake.model.head.y >= this.field.xMax )){
 			clearInterval(turnPace)
-			console.log("You lost!")
 		}
 		else if (( this.snake.model.head.x < 0 ) || ( this.snake.model.head.y < 0 )){
 			clearInterval(turnPace)
-			console.log("You lost, the snake is dead!")
 		}
 
 		else if ( this.snakeCollision() ){
 			clearInterval(turnPace)
-			console.log("You lose")
 		}
 
 		this.field.render();
@@ -60,7 +57,7 @@ function GameView ( opts ) {
 	this.snakeCollision = function () {
 		this.snake.model.snakeDeath;
 		for(  var i=1, segs = this.snake.model.segments; i<segs.length; i++ ){
-			(( segs[ i ].x == this.snake.model.head.x ) && ( segs[ i ].y == this.snake.model.head.y )) ? this.snake.model.snakeDeath = true : console.log("snake lives!") ;
+			(( segs[ i ].x == this.snake.model.head.x ) && ( segs[ i ].y == this.snake.model.head.y )) ? this.snake.model.snakeDeath = true : "";
 		};
 		return this.snake.model.snakeDeath;
 	};
@@ -96,8 +93,8 @@ SnakeFood.prototype = {
 		context.fillRect( this.xCoord, this.yCoord, 1, 1 );
 	},
 	updateFoodPos: function () {
-		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 2) )); //ymax
-		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 2) )); //xmax
+		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 2) ));
+		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 2) ));
 	},
 }
 /////////////The Snake////////////
@@ -124,16 +121,16 @@ SnakeBinder.prototype.changeDirection = function() {
 	document.onkeydown = function( e ) {
 		e = e || window.event;
 		switch(e.which || e.keyCode) {
-			case 37: binder.model.turn("left")//updateSnakeDirection( -1, 0 )//left
+			case 37: binder.model.turn("left")
 			break;
 
-			case 38: binder.model.turn("down")//updateSnakeDirection( 0, -1 )//down
+			case 38: binder.model.turn("down")
 			break;
 
-			case 39: binder.model.turn("right")//updateSnakeDirection( 1, 0 )//right
+			case 39: binder.model.turn("right")
 			break;
 
-			case 40: binder.model.turn("up")//updateSnakeDirection( 0, 1 )//up
+			case 40: binder.model.turn("up")
 			break;
 		}
 	e.preventDefault(); 
@@ -165,36 +162,28 @@ SnakeModel.prototype = {
 
 	turn: function ( direction ) {
 		switch( direction ){
-			case "left": if (this.direction == "right") {
-				console.log("no backwards!")
-			}
+			case "left": if (this.direction == "right") {}
 			else{ 
 				this.updateSnakeDirection( -1, 0 );
 				this.direction = "left";
 			};
 			break;
 
-			case "down": if (this.direction == "up") {
-				console.log("no backwards!")
-			}
+			case "down": if (this.direction == "up") {}
 			else{ 
 				this.updateSnakeDirection( 0, -1 );
 				this.direction = "down";
 			};
 			break;
 
-			case "right": if (this.direction == "left") {
-				console.log("no backwards!")
-			}
+			case "right": if (this.direction == "left") {}
 			else{ 
 				this.updateSnakeDirection( 1, 0 );
 				this.direction = "right";
 			};
 			break;
 
-			case "up": if (this.direction == "down") {
-				console.log("no backwards!")
-			}
+			case "up": if (this.direction == "down") {}
 			else{ 
 				this.updateSnakeDirection( 0, 1 );
 				this.direction = "up";
