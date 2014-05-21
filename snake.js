@@ -37,7 +37,8 @@ function GameView ( opts ) {
 			this.food.updateFoodPos();
 			this.snake.model.eat();
 		}
-		else if (( this.snake.model.head.x >= this.field.xMax ) || ( this.snake.model.head.y >= this.field.yMax )){
+
+		else if (( this.snake.model.head.x >= this.field.yMax ) || ( this.snake.model.head.y >= this.field.xMax )){
 			clearInterval(turnPace)
 			console.log("You lost!")
 		}
@@ -45,26 +46,24 @@ function GameView ( opts ) {
 			clearInterval(turnPace)
 			console.log("You lost, the snake is dead!")
 		}
-		// else if ( this.snakeCollision() ){
-		// 	console.log("You lose")
-		// 	this.snake = "dead snake 0 points!"
-		// }
+
+		else if ( this.snakeCollision() ){
+			clearInterval(turnPace)
+			console.log("You lose")
+		}
 
 		this.field.render();
 		this.food.render( this.field.context );
 		this.snake.render();
 	};
 
-	// this.snakeCollision = function () {
-	// 	for(  var i=1, segs = this.snake.model.segments; i<segs.length; i++ ){
-	// 		if((segs[ i ].x == this.snake.model.head.x) && (segs[ i ].y == this.snake.model.head.y)){
-	// 			return true
-	// 		}
-	// 		else{
-	// 			return false;
-	// 		}
-	// 	};
-	// };
+	this.snakeCollision = function () {
+		this.snake.model.snakeDeath;
+		for(  var i=1, segs = this.snake.model.segments; i<segs.length; i++ ){
+			(( segs[ i ].x == this.snake.model.head.x ) && ( segs[ i ].y == this.snake.model.head.y )) ? this.snake.model.snakeDeath = true : console.log("snake lives!") ;
+		};
+		return this.snake.model.snakeDeath;
+	};
 }
 
 /////////////The Field////////////
@@ -97,11 +96,10 @@ SnakeFood.prototype = {
 		context.fillRect( this.xCoord, this.yCoord, 1, 1 );
 	},
 	updateFoodPos: function () {
-		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 2) ));
-		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 2) ));
+		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 2) )); //ymax
+		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 2) )); //xmax
 	},
 }
-
 /////////////The Snake////////////
 function SnakeController ( context ) {
 	this.view = new SnakeView ( context ) ;
@@ -112,7 +110,6 @@ SnakeController.prototype = {
 	render: function () {
 		this.view.draw( this.model.segments );
 	},
-
 	move: function () {
 		this.model.updateSnakePosition();
 	},
@@ -122,22 +119,21 @@ function SnakeBinder ( model ) {
 	this.model = model;
 	this.changeDirection();
 }
-
 SnakeBinder.prototype.changeDirection = function() {
 	binder = this;
 	document.onkeydown = function( e ) {
 		e = e || window.event;
 		switch(e.which || e.keyCode) {
-			case 37: binder.model.updateSnakeDirection( -1, 0 )//left
+			case 37: binder.model.turn("left")//updateSnakeDirection( -1, 0 )//left
 			break;
 
-			case 38: binder.model.updateSnakeDirection( 0, -1 )//down
+			case 38: binder.model.turn("down")//updateSnakeDirection( 0, -1 )//down
 			break;
 
-			case 39: binder.model.updateSnakeDirection( 1, 0 )//right
+			case 39: binder.model.turn("right")//updateSnakeDirection( 1, 0 )//right
 			break;
 
-			case 40: binder.model.updateSnakeDirection( 0, 1 )//up
+			case 40: binder.model.turn("up")//updateSnakeDirection( 0, 1 )//up
 			break;
 		}
 	e.preventDefault(); 
@@ -160,15 +156,57 @@ function SnakeModel () {
 	this.segments = [ {x:0, y:0} ];
 	this.head = this.segments[ this.segments.length - 1 ];
 
+	this.direction = "right";
 	this.xdirection = 1;
 	this.ydirection = 0;
+	this.snakeDeath = false;
 }
 SnakeModel.prototype = {
+
+	turn: function ( direction ) {
+		switch( direction ){
+			case "left": if (this.direction == "right") {
+				console.log("no backwards!")
+			}
+			else{ 
+				this.updateSnakeDirection( -1, 0 );
+				this.direction = "left";
+			};
+			break;
+
+			case "down": if (this.direction == "up") {
+				console.log("no backwards!")
+			}
+			else{ 
+				this.updateSnakeDirection( 0, -1 );
+				this.direction = "down";
+			};
+			break;
+
+			case "right": if (this.direction == "left") {
+				console.log("no backwards!")
+			}
+			else{ 
+				this.updateSnakeDirection( 1, 0 );
+				this.direction = "right";
+			};
+			break;
+
+			case "up": if (this.direction == "down") {
+				console.log("no backwards!")
+			}
+			else{ 
+				this.updateSnakeDirection( 0, 1 );
+				this.direction = "up";
+			};
+			break;
+		}
+	},
 
 	updateSnakeDirection: function ( xdirection, ydirection ) {
 			this.xdirection = xdirection;
 			this.ydirection = ydirection;
-		},
+	},
 
 	updateSnakePosition: function () {
 				newHead = {};
