@@ -39,14 +39,14 @@ function GameView ( opts ) {
 		}
 
 		else if (( this.snake.model.head.x >= (this.field.yMax - 3) ) || ( this.snake.model.head.y >= (this.field.xMax - 3) )){//transforms by 3
-			clearInterval(turnPace)
+			clearInterval( turnPace )
 		}
 		else if (( this.snake.model.head.x < 0 ) || ( this.snake.model.head.y < 0 )){
-			clearInterval(turnPace)
+			clearInterval( turnPace )
 		}
 
 		else if ( this.snakeCollision() ){
-			clearInterval(turnPace)
+			clearInterval( turnPace )
 		}
 
 		this.field.render();
