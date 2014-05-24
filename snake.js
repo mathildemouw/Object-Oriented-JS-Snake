@@ -1,15 +1,15 @@
 window.onload = function () {
 
-	myField = new Field( {canvasId: "snake", yMax: 90, xMax: 50} );
+	myField = new Field( {canvasId: "snake", yMax: 900, xMax: 500} );
 	mySnakeFood = new SnakeFood( {xMax: myField.xMax, yMax: myField.yMax} );
 
 	mySnake = new SnakeController( myField.context );
-	
+
 	ecosystem = new GameView( { field: myField, food: mySnakeFood, snake: mySnake } );
 	ecosystem.render();
 
 	myGame = new GameController( { scene: ecosystem, snake: mySnake } );
-	turnPace = setInterval( myGame.nextTurn, 500 );
+	turnPace = setInterval( myGame.nextTurn, 200 );
 
 };
 /////////////Each Turn////////////
@@ -32,8 +32,45 @@ function GameView ( opts ) {
 	this.food = opts.food;
 	this.snake = opts.snake;
 
+	this.checkCollision = function(opts) {
+		var occupiedCoords = opts['occupiedCoords']
+		var occupiedSize = opts['occupiedSize']
+		var occupierCoords = opts['occupierCoords']
+		var occupierSize = opts['occupierSize']
+
+
+		var xOverlap = this.checkAxisOverlap({ occupiedPoint: occupiedCoords['x'],
+											 occupiedSize: occupiedSize,
+											 occupierPoint: occupierCoords['x'],
+											 occupierSize: occupierSize })
+
+		var yOverlap = this.checkAxisOverlap({ occupiedPoint: occupiedCoords['y'],
+											 occupiedSize: occupiedSize,
+											 occupierPoint: occupierCoords['y'],
+											 occupierSize: occupierSize })
+
+		return (xOverlap && yOverlap)
+	}
+
+  this.checkAxisOverlap = function(opts) {
+    var occupiedStart = opts["occupiedPoint"]
+    var occupiedEnd = opts["occupiedPoint"] + opts["occupiedSize"]
+    var occupierStart = opts["occupierPoint"]
+    var occupierEnd = opts["occupierPoint"] + opts["occupierSize"]
+
+    if ( occupierStart >= occupiedStart && occupierStart <= occupiedEnd ) { return true }
+    if ( occupierEnd >= occupiedStart && occupierEnd <= occupiedEnd ) { return true }
+
+    return false
+  }
+
+
 	this.render = function () {
-		if (( this.snake.model.head.x == this.food.xCoord ) && ( this.snake.model.head.y == this.food.yCoord )){
+		var collisionOpts = { occupiedCoords: {x: this.food.xCoord, y: this.food.yCoord } ,
+													occupiedSize: 40,
+													occupierCoords: { x: this.snake.model.head.x, y: this.snake.model.head.y } ,
+													occupierSize: 10}
+		if ( this.checkCollision( collisionOpts ) ){
 			this.food.updateFoodPos();
 			this.snake.model.eat();
 		}
@@ -77,12 +114,12 @@ Field.prototype = {
 		this.context.fillStyle = "#AFEEEE";
 		this.context.fillRect( 0, 0, this.yMax, this.xMax );
 	},
-}	
+}
 
 /////////////The Food////////////
 function SnakeFood ( opts ) {
-	this.xCoord = 3;
-	this.yCoord = 3;
+	this.xCoord = 30;
+	this.yCoord = 30;
 	this.xMax = opts.xMax;
 	this.yMax = opts.yMax;
 }
@@ -90,11 +127,11 @@ function SnakeFood ( opts ) {
 SnakeFood.prototype = {
 	render: function( context ){
 		context.fillStyle = "#FF10E0";
-		context.fillRect( this.xCoord, this.yCoord, 1, 1 );
+		context.fillRect( this.xCoord, this.yCoord, 40, 40);
 	},
 	updateFoodPos: function () {
-		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 2) ));
-		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 2) ));
+		this.xCoord = ( Math.floor( Math.random()*(this.yMax - 2) )); //must return 1-9
+		this.yCoord = ( Math.floor( Math.random()*(this.xMax - 2) )); //1-9, then multiply by 10
 	},
 }
 /////////////The Snake////////////
@@ -133,7 +170,7 @@ SnakeBinder.prototype.changeDirection = function() {
 			case 40: binder.model.turn("up")
 			break;
 		}
-	e.preventDefault(); 
+	e.preventDefault();
   }
 }
 
@@ -144,7 +181,7 @@ SnakeView.prototype = {
 	draw: function ( segments ) {
 		for (var i=0, segments; i<segments.length; i++){
 			this.context.fillStyle = "#000000";
-			this.context.fillRect( segments[ i ].x, segments[ i ].y, 1, 1 );
+			this.context.fillRect( segments[ i ].x, segments[ i ].y, 10, 10 );
 		}
 	},
 }
@@ -154,7 +191,7 @@ function SnakeModel () {
 	this.head = this.segments[ this.segments.length - 1 ];
 
 	this.direction = "right";
-	this.xdirection = 1;
+	this.xdirection = 10;
 	this.ydirection = 0;
 	this.snakeDeath = false;
 }
@@ -163,29 +200,29 @@ SnakeModel.prototype = {
 	turn: function ( direction ) {
 		switch( direction ){
 			case "left": if (this.direction == "right") {}
-			else{ 
-				this.updateSnakeDirection( -1, 0 );
+			else{
+				this.updateSnakeDirection( -10, 0 );
 				this.direction = "left";
 			};
 			break;
 
 			case "down": if (this.direction == "up") {}
-			else{ 
-				this.updateSnakeDirection( 0, -1 );
+			else{
+				this.updateSnakeDirection( 0, -10 );
 				this.direction = "down";
 			};
 			break;
 
 			case "right": if (this.direction == "left") {}
-			else{ 
-				this.updateSnakeDirection( 1, 0 );
+			else{
+				this.updateSnakeDirection( 10, 0 );
 				this.direction = "right";
 			};
 			break;
 
 			case "up": if (this.direction == "down") {}
-			else{ 
-				this.updateSnakeDirection( 0, 1 );
+			else{
+				this.updateSnakeDirection( 0, 10 );
 				this.direction = "up";
 			};
 			break;
@@ -210,5 +247,5 @@ SnakeModel.prototype = {
 		newTail = this.segments[ 0 ];
 		this.segments.push( newTail );
 	},
-	
+
 }
