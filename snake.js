@@ -9,7 +9,7 @@ window.onload = function () {
 	ecosystem.render();
 
 	myGame = new GameController( { scene: ecosystem, snake: mySnake } );
-	turnPace = setInterval( myGame.nextTurn, 500 );
+	turnPace = setInterval( myGame.nextTurn, 200 );
 
 };
 /////////////Each Turn////////////
@@ -37,26 +37,40 @@ function GameView ( opts ) {
 		var occupiedSize = opts['occupiedSize']
 		var occupierCoords = opts['occupierCoords']
 		var occupierSize = opts['occupierSize']
-		// check x axis, input point a, size a, point b, size b
-		// check y axis
+
+
+		var xOverlap = this.checkAxisOverlap({ occupiedPoint: occupiedCoords['x'],
+											 occupiedSize: occupiedSize,
+											 occupierPoint: occupierCoords['x'],
+											 occupierSize: occupierSize })
+
+		var yOverlap = this.checkAxisOverlap({ occupiedPoint: occupiedCoords['y'],
+											 occupiedSize: occupiedSize,
+											 occupierPoint: occupierCoords['y'],
+											 occupierSize: occupierSize })
+
+		return (xOverlap && yOverlap)
 	}
 
-	this.checkAxisOverlap = function(opts) {
-		var occupiedA = opts["occupiedPoint"]
-		var occupiedB = opts["occupiedPoint"] + opts["occupiedSize"]
-		var occupierA = opts["occupierPoint"]
-		var occupierB = opts["occupierPoint"] + opts["occupierSize"]
+  this.checkAxisOverlap = function(opts) {
+    var occupiedStart = opts["occupiedPoint"]
+    var occupiedEnd = opts["occupiedPoint"] + opts["occupiedSize"]
+    var occupierStart = opts["occupierPoint"]
+    var occupierEnd = opts["occupierPoint"] + opts["occupierSize"]
 
-		if ( occupiedA > occupierA || occupiedA < occupierB ) { return true }
+    if ( occupierStart >= occupiedStart && occupierStart <= occupiedEnd ) { return true }
+    if ( occupierEnd >= occupiedStart && occupierEnd <= occupiedEnd ) { return true }
 
-		if ( occupiedB > occupierB || occupiedB < occupierB ) { return true }
-
-		return false
-	}
+    return false
+  }
 
 
 	this.render = function () {
-		if (( this.snake.model.head.x == this.food.xCoord ) && ( this.snake.model.head.y == this.food.yCoord )){
+		var collisionOpts = { occupiedCoords: {x: this.food.xCoord, y: this.food.yCoord } ,
+													occupiedSize: 40,
+													occupierCoords: { x: this.snake.model.head.x, y: this.snake.model.head.y } ,
+													occupierSize: 10}
+		if ( this.checkCollision( collisionOpts ) ){
 			this.food.updateFoodPos();
 			this.snake.model.eat();
 		}
