@@ -1,6 +1,7 @@
 window.onload = function () {
 
 	myField = new Field( {canvasId: "snake", yMax: 900, xMax: 500} );
+
 	mySnakeFood = new SnakeFood( {xMax: myField.xMax, yMax: myField.yMax} );
 
 	mySnake = new SnakeController( myField.context );
@@ -9,7 +10,7 @@ window.onload = function () {
 	ecosystem.render();
 
 	myGame = new GameController( { scene: ecosystem, snake: mySnake } );
-	turnPace = setInterval( myGame.nextTurn, 200 );
+	turnPace = setInterval( myGame.nextTurn, 90 );
 
 };
 /////////////Each Turn////////////
@@ -75,15 +76,15 @@ function GameView ( opts ) {
 			this.snake.model.eat();
 		}
 
-		else if (( this.snake.model.head.x >= this.field.yMax ) || ( this.snake.model.head.y >= this.field.xMax )){
-			clearInterval(turnPace)
+		else if (( this.snake.model.head.x >= (this.field.yMax - 3) ) || ( this.snake.model.head.y >= (this.field.xMax - 3) )){//transforms by 3
+			clearInterval( turnPace )
 		}
 		else if (( this.snake.model.head.x < 0 ) || ( this.snake.model.head.y < 0 )){
-			clearInterval(turnPace)
+			clearInterval( turnPace )
 		}
 
 		else if ( this.snakeCollision() ){
-			clearInterval(turnPace)
+			clearInterval( turnPace )
 		}
 
 		this.field.render();
@@ -118,8 +119,10 @@ Field.prototype = {
 
 /////////////The Food////////////
 function SnakeFood ( opts ) {
+
 	this.xCoord = 30;
 	this.yCoord = 30;
+
 	this.xMax = opts.xMax;
 	this.yMax = opts.yMax;
 }
@@ -197,7 +200,7 @@ function SnakeModel () {
 }
 SnakeModel.prototype = {
 
-	turn: function ( direction ) {
+	turn: function ( direction ) { //transforms by 3
 		switch( direction ){
 			case "left": if (this.direction == "right") {}
 			else{
