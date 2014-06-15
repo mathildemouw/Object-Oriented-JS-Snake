@@ -1,6 +1,6 @@
 window.onload = function () {
 
-	myField = new Field( {canvasId: "snake", yMax: 900, xMax: 500} );
+	myField = new Field( {canvasId: "snake", yMax: 500, xMax: 300} );
 	mySnakeFood = new SnakeFood( {xMax: myField.xMax, yMax: myField.yMax} );
 
 	mySnake = new SnakeController( myField.context );
