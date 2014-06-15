@@ -10,7 +10,7 @@ window.onload = function () {
 	ecosystem.render();
 
 	myGame = new GameController( { scene: ecosystem, snake: mySnake } );
-	turnPace = setInterval( myGame.nextTurn, 200 );
+	turnPace = setInterval( myGame.nextTurn, 90 );
 
 };
 /////////////Each Turn////////////
